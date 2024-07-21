@@ -22,6 +22,7 @@ public class DataEncryption {
     private String content;
     @Column(columnDefinition = "VARCHAR(10)")
     private String algorithm;
+
     @Transient
     @JsonIgnore
     private String tripleDesKey = "012345678901234567890123";
@@ -37,6 +38,9 @@ public class DataEncryption {
     @Transient
     @JsonIgnore
     private String initVector = "1234567812345678";
+
+    public DataEncryption() {
+    }
 
     public DataEncryption(Long id, String content, String algorithm) throws NoSuchAlgorithmException {
         this.id = id;
@@ -84,7 +88,8 @@ public class DataEncryption {
                     textEncrypted = cipher.doFinal(text);
                     break;
                 case "TripleDES":
-                    secretKeySpec = new SecretKeySpec(this.tripleDesKey.getBytes(StandardCharsets.UTF_8), this.algorithm);
+                    secretKeySpec = new SecretKeySpec(this.tripleDesKey.getBytes(StandardCharsets.UTF_8),
+                            this.algorithm);
                     iv = new IvParameterSpec(this.desInitVector.getBytes());
 
                     cipher = Cipher.getInstance("TripleDES/CBC/PKCS5Padding");
@@ -108,8 +113,8 @@ public class DataEncryption {
             }
 
             return Base64.getEncoder().encodeToString(textEncrypted);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
-                 BadPaddingException | InvalidAlgorithmParameterException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException
+                | BadPaddingException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -131,7 +136,8 @@ public class DataEncryption {
                     textDecrypted = cipher.doFinal(text);
                     break;
                 case "TripleDES":
-                    secretKeySpec = new SecretKeySpec(this.tripleDesKey.getBytes(StandardCharsets.UTF_8), this.algorithm);
+                    secretKeySpec = new SecretKeySpec(this.tripleDesKey.getBytes(StandardCharsets.UTF_8),
+                            this.algorithm);
                     iv = new IvParameterSpec(this.desInitVector.getBytes());
 
                     cipher = Cipher.getInstance("TripleDES/CBC/PKCS5Padding");
@@ -141,10 +147,10 @@ public class DataEncryption {
                     break;
                 case "AES":
                     secretKeySpec = new SecretKeySpec(this.key.getBytes(), this.algorithm);
-                    IvParameterSpec ivSpec = new IvParameterSpec(this.initVector.getBytes());
+                    iv = new IvParameterSpec(this.initVector.getBytes());
 
                     cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivSpec);
+                    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
                     text = Base64.getDecoder().decode(this.content);
                     textDecrypted = cipher.doFinal(text);
                     break;
@@ -155,8 +161,8 @@ public class DataEncryption {
             }
 
             return new String(textDecrypted);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
-                 BadPaddingException | InvalidAlgorithmParameterException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException
+                | BadPaddingException | InvalidAlgorithmParameterException | UnsupportedEncodingException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
