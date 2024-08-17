@@ -1,7 +1,5 @@
 package utils;
 
-import org.apache.logging.log4j.util.Base64Util;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
